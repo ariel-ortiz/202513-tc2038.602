@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections.abc import Iterator, Iterable
 from typing import cast
 
 
@@ -19,28 +20,39 @@ class OrderedSet[T]:
     __sentinel: _Node[T]
     __count: int
 
-    # Complexity: O(1)
-    def __init__(self) -> None:
+    # Complexity: O(N^2)
+    def __init__(self, values: Iterable[T] = []) -> None:
         self.__sentinel = _Node()
         self.__count = 0
+        for elem in values:
+            self.add(elem)
+
+    # Complexity: O(N)
+    def __iter__(self) -> Iterator[T]:
+        current: _Node[T] = self.__sentinel.next
+        while current != self.__sentinel:
+            yield cast(T, current.info)
+            current = current.next
 
     # Complexity: O(1)
     def __len__(self) -> int:
         return self.__count
 
     # Complexity: O(N)
-    def __repr__(self) -> str:
-        result: list[T] = []
-        current: _Node[T] = self.__sentinel.next
-        while current != self.__sentinel:
-            result.append(cast(T, current.info))
-            current = current.next
-        return f"OrderedSet({result if result else ''})"
+    def __contains__(self, value: T) -> bool:
+        for elem in self:
+            if elem == value:
+                return True
+        return False
 
-    # Complexity: O(1)
+    # Complexity: O(N)
+    def __repr__(self) -> str:
+        return f"OrderedSet({list(self) if self else ''})"
+
+    # Complexity: O(N)
     def add(self, value: T ) -> None:
-        # TODO: Check if value exists
-        # Assume that value doesn't exist, so add at the end
+        if value in self:
+            return
         self.__count += 1
         new_node: _Node[T] = _Node(value)
         new_node.next = self.__sentinel
@@ -59,3 +71,12 @@ if __name__ == '__main__':
     s.add(108)
     print(len(s))
     print(s)
+    print(list(s))
+    print(108 in s)
+    print(107 in s)
+    b: OrderedSet[str] = OrderedSet('hello')
+    print(b)
+    c = b
+    c.add('x')
+    print(b)
+    print(c)
