@@ -18,6 +18,21 @@ def depth_first_search(
             stack.extend(graph[current][::-1])
             yield current
 
+
+def breadth_first_search(
+        start: str,
+        graph: Graph) -> Iterator[str]:
+    queue: deque[str] = deque()
+    visited: set[str] = set()
+    queue.append(start)
+    while queue:
+        current: str = queue.popleft()
+        if current not in visited:
+            visited.add(current)
+            queue.extend(graph[current])
+            yield current
+
+
 if __name__ == "__main__":
     g: Graph = {
         'A': ['B', 'C', 'F'],
@@ -30,3 +45,20 @@ if __name__ == "__main__":
     }
     print(list(depth_first_search('A', g)))
     print(list(depth_first_search('D', g)))
+    print(list(depth_first_search('G', g)))
+    start: str = 'E'
+    end: str = 'A'
+    for v in depth_first_search(start, g):
+        print(v)
+        if v == end:
+            break
+    print(list(breadth_first_search('A', g)))
+    print(list(breadth_first_search('G', g)))
+    start = 'C'
+    end = 'E'
+    for v in breadth_first_search(start, g):
+        print(v)
+        if v == end:
+            break
+    print(list(breadth_first_search(start, g)))
+
